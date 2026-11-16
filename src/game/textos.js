@@ -61,5 +61,6 @@ export const TEXTOS = {
     musicaLigada: 'Música ligada.',
     musicaDesligada: 'Música desligada.',
 
-    novoJogo: 'Novo jogo. '
+    novoJogo: 'Novo jogo. ',
+    agoraEstasEm: (nome) => ` Agora estás em: ${nome}.`
 };

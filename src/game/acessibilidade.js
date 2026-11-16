@@ -129,8 +129,11 @@ export class CamadaAcessivel {
     }
 
     // Mensagem para o leitor de ecrã. Limpa primeiro, para a mesma frase ser lida duas vezes.
-    // urgente = true para o resultado (certo/errado): o leitor lê logo, sem esperar.
-    anunciar (texto, urgente = false) {
+    // urgente = true: o leitor lê logo, mesmo que esteja a dizer outra coisa.
+    // Nos testes com VoiceOver, as mensagens "educadas" (não urgentes) perdiam-se quando
+    // o foco mudava ou um botão mudava de estado. Por isso as respostas às ações são urgentes.
+    // atraso: tempo (ms) antes de escrever a mensagem, para o leitor acabar de reagir ao foco.
+    anunciar (texto, urgente = true, atraso = 80) {
         const zona = urgente ? this.alertas : this.mensagens;
         const outra = urgente ? this.mensagens : this.alertas;
         outra.textContent = '';
@@ -138,7 +141,7 @@ export class CamadaAcessivel {
         clearTimeout(this._t);
         this._t = setTimeout(() => {
             zona.textContent = texto;
-        }, 80);
+        }, atraso);
     }
 
     focar (el) {

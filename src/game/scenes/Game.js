@@ -66,7 +66,7 @@ export class Game extends Scene {
 
         // Ao abrir: mostra o objetivo e diz-o ao leitor de ecrã
         this.mostrarObjetivo(false);
-        this.time.delayedCall(1200, () => this.camada.anunciar(TEXTOS.objetivo));
+        this.time.delayedCall(1200, () => this.camada.anunciar(TEXTOS.objetivo, false));
     }
 
     // ---------- Desenho ----------
@@ -281,15 +281,20 @@ export class Game extends Scene {
         });
         this.sons.colocar();
 
-        let mensagem = TEXTOS.escolheste(item.nome, n, this.total);
-        if (n === this.total) mensagem += ' ' + TEXTOS.sequenciaCompleta(this.listaNomes());
-        this.camada.anunciar(mensagem);
         this.atualizarBotoes();
 
         // O botão deste vaso desapareceu, por isso o foco vai para o próximo vaso
         // ou, se já estão todos escolhidos, para Executar.
         const proximo = this.itensPelaOrdemDoEcra().find((i) => i.noTapete);
-        this.camada.focar(proximo ? proximo.botao : this.botoes.executar);
+        const destino = proximo ? proximo.botao : this.botoes.executar;
+        this.camada.focar(destino);
+
+        // A mensagem diz o que se escolheu e também onde ficou o foco,
+        // porque o leitor de ecrã interrompe a leitura do novo botão para a dizer.
+        let mensagem = TEXTOS.escolheste(item.nome, n, this.total);
+        if (n === this.total) mensagem += ' ' + TEXTOS.sequenciaCompleta(this.listaNomes());
+        mensagem += TEXTOS.agoraEstasEm(destino.getAttribute('aria-label'));
+        this.camada.anunciar(mensagem, true, 350);
     }
 
     tirar (i) {
@@ -420,9 +425,13 @@ export class Game extends Scene {
         this.camada.esconder(this.botoes.recomecar, true);
         this.baralhar();
         this.atualizarBotoes();
-        this.camada.focar(this.itensPelaOrdemDoEcra()[0].botao);
+        const primeiro = this.itensPelaOrdemDoEcra()[0].botao;
+        this.camada.focar(primeiro);
         this.mostrarObjetivo(false);
-        this.camada.anunciar(TEXTOS.novoJogo + TEXTOS.objetivo);
+        this.camada.anunciar(
+            TEXTOS.novoJogo + TEXTOS.objetivo + TEXTOS.agoraEstasEm(primeiro.getAttribute('aria-label')),
+            true, 350
+        );
     }
 
     alternarMusica () {
