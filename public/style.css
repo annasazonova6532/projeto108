@@ -1,0 +1,65 @@
+body {
+    margin: 0;
+    padding: 0;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #000000;
+}
+
+#app {
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* O contentor do jogo é a referência para a camada acessível */
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Camada acessível: fica exatamente por cima do canvas */
+#camada {
+    position: absolute;
+    pointer-events: none;
+}
+
+/* Botões invisíveis, mas que o rato, o teclado e o leitor de ecrã encontram */
+#camada button {
+    position: absolute;
+    pointer-events: auto;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 18px;
+    background: transparent;
+    color: transparent;
+    cursor: pointer;
+}
+
+#camada button[aria-disabled="true"] {
+    cursor: default;
+}
+
+/* Moldura de foco bem visível (diferente do brilho "pode carregar" dos vasos) */
+#camada button:focus-visible {
+    outline: 5px solid #ffd400;
+    outline-offset: 4px;
+    box-shadow: 0 0 0 4px #1a1a1a;
+}
+
+/* Texto só para o leitor de ecrã */
+.so-leitor {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
