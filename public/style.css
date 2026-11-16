@@ -1,7 +1,5 @@
 body {
     margin: 0;
-    padding: 0;
-    color: rgba(255, 255, 255, 0.87);
     background-color: #000000;
 }
 
@@ -14,44 +12,47 @@ body {
     align-items: center;
 }
 
-/* O contentor do jogo é a referência para a camada acessível */
+/* O jogo ocupa o maior retângulo 4:3 que cabe na janela (1024 x 768 é 4:3). */
 #game-container {
     position: relative;
-    width: 100%;
-    height: 100%;
+    width: min(100vw, calc(100vh * 4 / 3));
+    aspect-ratio: 4 / 3;
 }
 
-/* Camada acessível: fica exatamente por cima do canvas */
+#game-container canvas {
+    display: block;
+}
+
+/* A camada de botões fica exatamente por cima do jogo. */
 #camada {
     position: absolute;
-    pointer-events: none;
+    inset: 0;
 }
 
-/* Botões invisíveis, mas que o rato, o teclado e o leitor de ecrã encontram */
+/* Botões invisíveis: não se veem, mas o rato, o teclado e o leitor de ecrã encontram-nos. */
 #camada button {
     position: absolute;
-    pointer-events: auto;
     margin: 0;
     padding: 0;
     border: 0;
     border-radius: 18px;
     background: transparent;
-    color: transparent;
     cursor: pointer;
 }
 
-#camada button[aria-disabled="true"] {
-    cursor: default;
+/* Rato por cima: contorno azul-claro. */
+#camada button:hover:not([aria-disabled="true"]) {
+    box-shadow: 0 0 0 4px #4fd1ff;
 }
 
-/* Moldura de foco bem visível (diferente do brilho "pode carregar" dos vasos) */
+/* Foco do teclado: moldura amarela grossa, bem visível. */
 #camada button:focus-visible {
     outline: 5px solid #ffd400;
     outline-offset: 4px;
     box-shadow: 0 0 0 4px #1a1a1a;
 }
 
-/* Texto só para o leitor de ecrã */
+/* Texto que não se vê, mas que o leitor de ecrã lê. */
 .so-leitor {
     position: absolute;
     width: 1px;

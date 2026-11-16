@@ -10,7 +10,29 @@
 
 <body>
     <main id="app">
-        <div id="game-container"></div>
+        <!-- Título e instruções. Não se veem no ecrã: são só para o leitor de ecrã. -->
+        <h1 class="so-leitor">Jogo do robô: a planta a crescer</h1>
+        <p class="so-leitor">
+            Ajuda o robô a fazer crescer uma flor. Cada vaso do tapete é um passo.
+            Escolhe os três passos pela ordem certa e depois carrega em Executar.
+            Usa a tecla Tab para passar de um botão para outro, e Espaço ou Enter para escolher.
+        </p>
+
+        <!-- Zona de mensagens. O leitor de ecrã lê em voz alta tudo o que o jogo escreve aqui. -->
+        <div id="mensagens" class="so-leitor" role="alert" aria-live="assertive"></div>
+
+        <!-- O Phaser desenha o jogo aqui dentro, num canvas. -->
+        <div id="game-container">
+            <!-- Camada de botões invisíveis, por cima do desenho.
+                 Os botões são criados em src/game/acessibilidade.js, dentro destes grupos.
+                 A ordem dos grupos é a ordem do Tab. -->
+            <div id="camada">
+                <div id="grupo-objetivo" role="group" aria-label="Objetivo"></div>
+                <div id="grupo-passos" role="group" aria-label="Passos escolhidos"></div>
+                <div id="grupo-tapete" role="group" aria-label="Vasos no tapete"></div>
+                <div id="grupo-controlos" role="group" aria-label="Controlos"></div>
+            </div>
+        </div>
     </main>
     <script type="module" src="src/main.js"></script>
 </body>

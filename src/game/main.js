@@ -1,7 +1,7 @@
 import { Game as MainGame } from './scenes/Game';
 import { AUTO, Scale, Game } from 'phaser';
 
-// Configuração do jogo. Mais informação:
+// Configuração do Phaser. Mais informação:
 // https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config = {
     type: AUTO,
@@ -10,11 +10,10 @@ const config = {
     parent: 'game-container',
     backgroundColor: '#bfe9f2',
     scale: {
-        mode: Scale.FIT,
-        autoCenter: Scale.CENTER_BOTH
+        mode: Scale.FIT          // o jogo estica até encher o #game-container
     },
-    // O teclado do Phaser fica desligado: o teclado funciona pelos botões HTML da camada acessível.
-    // Assim o Phaser não "rouba" teclas ao VoiceOver ou ao NVDA.
+    // O teclado do Phaser fica desligado. O teclado funciona pelos botões HTML invisíveis,
+    // e assim o Phaser não "rouba" teclas ao VoiceOver nem ao NVDA.
     input: {
         keyboard: false
     },
