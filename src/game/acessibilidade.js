@@ -34,10 +34,12 @@ export function moverBotao (botao, sitio) {
 
 // Diz uma frase ao leitor de ecrã: escreve-a na zona de mensagens do index.html.
 //   daquiA = quanto tempo esperar antes de a dizer, em milissegundos
+// Espera 1 segundo por defeito: nos testes com VoiceOver, as frases ditas logo a seguir
+// a carregar num botão perdiam-se, porque o VoiceOver ainda estava a ler o botão.
 // Limpa primeiro a zona, para o leitor de ecrã reparar na mudança mesmo que a frase seja igual.
 // Só fica uma frase à espera de cada vez: se chegar outra, a anterior é esquecida.
 let espera;
-export function anunciar (texto, daquiA = 300) {
+export function anunciar (texto, daquiA = 1000) {
     const zona = document.getElementById('mensagens');
     zona.textContent = '';
     clearTimeout(espera);

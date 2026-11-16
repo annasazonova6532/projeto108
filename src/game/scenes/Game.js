@@ -24,7 +24,7 @@ import * as desenhos from '../desenhos';
 
 const SITIOS = desenhos.SITIOS;
 const TOTAL = NIVEL.ordemCerta.length;     // quantos passos tem o nível
-const VOLUME_DA_MUSICA = 0.12;             // baixinho, para não tapar as vozes
+const VOLUME_DA_MUSICA = 0.08;             // baixinho, para não tapar as vozes
 
 // "Menos movimento": se o aparelho tiver esta opção ligada, nada desliza nem abana.
 const MENOS_MOVIMENTO = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
