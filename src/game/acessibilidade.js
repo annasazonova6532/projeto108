@@ -17,11 +17,18 @@ const ALTURA_DO_JOGO = 768;
 export function criarBotao (grupo, nome, sitio, aoCarregar) {
     const botao = document.createElement('button');
     botao.type = 'button';
-    botao.setAttribute('aria-label', nome);
+    mudarNome(botao, nome);
     botao.addEventListener('click', aoCarregar);
     moverBotao(botao, sitio);
     document.getElementById(grupo).appendChild(botao);
     return botao;
+}
+
+// Muda o nome de um botão. O nome fica guardado também em data-nome,
+// para se poder voltar a ele depois de uma frase (ver focarComFrase).
+export function mudarNome (botao, nome) {
+    botao.dataset.nome = nome;
+    botao.setAttribute('aria-label', nome);
 }
 
 // Põe o botão por cima do desenho. Usa percentagens para acompanhar o tamanho do jogo.
@@ -44,4 +51,36 @@ export function anunciar (texto, daquiA = 1000) {
     zona.textContent = '';
     clearTimeout(espera);
     espera = setTimeout(() => { zona.textContent = texto; }, daquiA);
+}
+
+// Esquece a frase que estiver à espera na zona de mensagens.
+function esquecerMensagem () {
+    clearTimeout(espera);
+    document.getElementById('mensagens').textContent = '';
+}
+
+// Põe o foco num botão e faz o leitor de ecrã dizer uma frase antes do nome do botão.
+// Porquê? Nos testes com VoiceOver (16/11 e 27/11), «Escolheste…» e «Tiraste…» perdiam-se:
+// a frase da zona de mensagens chegava depois de o foco mudar, ou a criança carregava
+// outra vez antes de passar 1 segundo e a frase era esquecida.
+// O leitor de ecrã lê sempre o nome do botão que recebe o foco, por isso a frase vai no nome:
+//   «Escolheste vaso com a flor já aberta. Passo 1 de 3. Vaso com uma semente na terra, botão»
+// Quando o foco sai do botão, o nome volta ao normal.
+export function focarComFrase (botao, frase) {
+    esquecerMensagem();
+    // Se o botão já tem o foco (ex.: Apagar), tira-se e volta a pôr-se,
+    // para o leitor de ecrã o ler outra vez com o nome novo.
+    if (document.activeElement === botao) botao.blur();
+    botao.setAttribute('aria-label', frase + ' ' + botao.dataset.nome);
+    botao.focus();
+    botao.addEventListener('blur', () => botao.setAttribute('aria-label', botao.dataset.nome), { once: true });
+}
+
+// Diz uma frase depois de uma ação.
+// Se o foco está num botão do jogo (teclado, VoiceOver, NVDA), a frase vai no nome desse botão.
+// Se não (por exemplo, com o rato no Safari, que não dá foco aos botões), usa a zona de mensagens.
+export function dizer (frase) {
+    const comFoco = document.activeElement;
+    if (comFoco && comFoco.closest('#camada') && !comFoco.hidden) focarComFrase(comFoco, frase);
+    else anunciar(frase);
 }

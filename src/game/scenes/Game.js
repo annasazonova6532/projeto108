@@ -19,7 +19,7 @@ import { Scene } from 'phaser';
 import { NIVEL } from '../nivel';
 import { TEXTOS } from '../textos';
 import { SONS } from '../sons';
-import { criarBotao, moverBotao, anunciar } from '../acessibilidade';
+import { criarBotao, moverBotao, mudarNome, anunciar, focarComFrase, dizer } from '../acessibilidade';
 import * as desenhos from '../desenhos';
 
 const SITIOS = desenhos.SITIOS;
@@ -112,12 +112,11 @@ export class Game extends Scene {
         this.atualizar();
         const seguinte = this.vasos.find((v) => !v.botao.hidden);
         const botao = seguinte ? seguinte.botao : this.botaoExecutar;
-        botao.focus();
 
-        // Para o leitor de ecrã: o que foi escolhido e onde está agora o foco
+        // Para o leitor de ecrã: o que foi escolhido, dito junto com o nome do botão que recebe o foco
         let frase = TEXTOS.escolheste(vaso.nome, n, TOTAL);
         if (n === TOTAL) frase += ' ' + TEXTOS.todosEscolhidos(this.passos.map((v) => v.nome).join(', '));
-        anunciar(frase + ' ' + TEXTOS.agoraEstasEm(botao.getAttribute('aria-label')));
+        focarComFrase(botao, frase);
     }
 
     // ---------- A criança tira um vaso de um passo ----------
@@ -126,7 +125,7 @@ export class Game extends Scene {
         if (this.aVerificar || this.ganhou) return;
         const vaso = this.passos[i];
         if (!vaso) {
-            anunciar(TEXTOS.passoVazioAoCarregar(i + 1));
+            dizer(TEXTOS.passoVazioAoCarregar(i + 1));
             return;
         }
         this.calar();
@@ -142,12 +141,12 @@ export class Game extends Scene {
 
         vaso.botao.hidden = false;
         this.atualizar();
-        anunciar(TEXTOS.tiraste(vaso.nome, i + 1));
+        dizer(TEXTOS.tiraste(vaso.nome, i + 1));
     }
 
     apagarUltimo () {
         if (this.passos.length === 0) {
-            anunciar(TEXTOS.nadaParaApagar);
+            dizer(TEXTOS.nadaParaApagar);
             return;
         }
         this.tirar(this.passos.length - 1);
@@ -159,7 +158,7 @@ export class Game extends Scene {
         if (this.aVerificar || this.ganhou) return;
         const faltam = TOTAL - this.passos.length;
         if (faltam > 0) {
-            anunciar(TEXTOS.faltamPassos(faltam));
+            dizer(TEXTOS.faltamPassos(faltam));
             return;
         }
 
@@ -246,8 +245,7 @@ export class Game extends Scene {
         this.baralhar();
         this.atualizar();
         this.mostrarObjetivo();
-        this.vasos[0].botao.focus();
-        anunciar(TEXTOS.novoJogo + ' ' + TEXTOS.objetivo + ' ' + TEXTOS.agoraEstasEm(this.vasos[0].nome));
+        focarComFrase(this.vasos[0].botao, TEXTOS.novoJogo + ' ' + TEXTOS.objetivo);
     }
 
     // ---------- Ajudas ----------
@@ -316,7 +314,7 @@ export class Game extends Scene {
     atualizar () {
         this.botoesDosPassos.forEach((botao, i) => {
             const vaso = this.passos[i];
-            botao.setAttribute('aria-label', vaso ? TEXTOS.passoCheio(i + 1, vaso.nome) : TEXTOS.passoVazio(i + 1));
+            mudarNome(botao, vaso ? TEXTOS.passoCheio(i + 1, vaso.nome) : TEXTOS.passoVazio(i + 1));
         });
 
         // Um botão que não se pode usar fica mais apagado, e o leitor de ecrã diz "indisponível"
