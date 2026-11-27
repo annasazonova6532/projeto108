@@ -14,7 +14,20 @@ const ALTURA_DO_JOGO = 768;
 // Cria um botão invisível dentro de um grupo (os grupos estão no index.html).
 //   nome   = o que o leitor de ecrã diz
 //   sitio  = { x, y, largura, altura }, com x e y no centro, em coordenadas do jogo
-export function criarBotao (grupo, nome, sitio, aoCarregar) {
+//   gemeo  = true para botões em que se carrega várias vezes seguidas (Apagar, Executar, passos).
+//            Cria um segundo botão igual, escondido, no mesmo sítio. Ver focarComFrase.
+export function criarBotao (grupo, nome, sitio, aoCarregar, gemeo = false) {
+    const botao = novoBotao(grupo, nome, sitio, aoCarregar);
+    if (gemeo) {
+        const outro = novoBotao(grupo, nome, sitio, aoCarregar);
+        outro.hidden = true;
+        botao.gemeo = outro;
+        outro.gemeo = botao;
+    }
+    return botao;
+}
+
+function novoBotao (grupo, nome, sitio, aoCarregar) {
     const botao = document.createElement('button');
     botao.type = 'button';
     mudarNome(botao, nome);
@@ -27,8 +40,20 @@ export function criarBotao (grupo, nome, sitio, aoCarregar) {
 // Muda o nome de um botão. O nome fica guardado também em data-nome,
 // para se poder voltar a ele depois de uma frase (ver focarComFrase).
 export function mudarNome (botao, nome) {
-    botao.dataset.nome = nome;
-    botao.setAttribute('aria-label', nome);
+    [botao, botao.gemeo].filter(Boolean).forEach((b) => {
+        b.dataset.nome = nome;
+        b.setAttribute('aria-label', nome);
+    });
+}
+
+// Marca um botão (e o gémeo) como indisponível: o leitor de ecrã diz "indisponível".
+export function indisponivel (botao, sim) {
+    [botao, botao.gemeo].filter(Boolean).forEach((b) => b.setAttribute('aria-disabled', sim));
+}
+
+// O botão que está à vista: o próprio ou o gémeo.
+export function visivel (botao) {
+    return (botao.hidden && botao.gemeo && !botao.gemeo.hidden) ? botao.gemeo : botao;
 }
 
 // Põe o botão por cima do desenho. Usa percentagens para acompanhar o tamanho do jogo.
@@ -66,11 +91,23 @@ function esquecerMensagem () {
 // O leitor de ecrã lê sempre o nome do botão que recebe o foco, por isso a frase vai no nome:
 //   «Escolheste vaso com a flor já aberta. Passo 1 de 3. Vaso com uma semente na terra, botão»
 // Quando o foco sai do botão, o nome volta ao normal.
+//
+// Se o foco já está nesse botão (ex.: Apagar), o VoiceOver não o lê outra vez (teste de 27/11).
+// Por isso o botão troca de lugar com o gémeo: um botão igual, no mesmo sítio, que recebe o foco.
+// Para a criança nada muda: o foco continua no mesmo sítio e pode carregar outra vez.
 export function focarComFrase (botao, frase) {
     esquecerMensagem();
-    // Se o botão já tem o foco (ex.: Apagar), tira-se e volta a pôr-se,
-    // para o leitor de ecrã o ler outra vez com o nome novo.
-    if (document.activeElement === botao) botao.blur();
+    botao = visivel(botao);
+    if (document.activeElement === botao) {
+        if (botao.gemeo) {
+            const outro = botao.gemeo;
+            outro.hidden = false;
+            botao.hidden = true;
+            botao = outro;
+        } else {
+            botao.blur();
+        }
+    }
     botao.setAttribute('aria-label', frase + ' ' + botao.dataset.nome);
     botao.focus();
     botao.addEventListener('blur', () => botao.setAttribute('aria-label', botao.dataset.nome), { once: true });

@@ -19,7 +19,7 @@ import { Scene } from 'phaser';
 import { NIVEL } from '../nivel';
 import { TEXTOS } from '../textos';
 import { SONS } from '../sons';
-import { criarBotao, moverBotao, mudarNome, anunciar, focarComFrase, dizer } from '../acessibilidade';
+import { criarBotao, moverBotao, mudarNome, indisponivel, anunciar, focarComFrase, dizer } from '../acessibilidade';
 import * as desenhos from '../desenhos';
 
 const SITIOS = desenhos.SITIOS;
@@ -60,7 +60,7 @@ export class Game extends Scene {
         this.botaoOuvir = criarBotao('grupo-objetivo', TEXTOS.botoes.ouvir, SITIOS.ouvir, () => this.ouvir());
 
         this.botoesDosPassos = SITIOS.passos.map((sitio, i) =>
-            criarBotao('grupo-passos', TEXTOS.passoVazio(i + 1), sitio, () => this.tirar(i)));
+            criarBotao('grupo-passos', TEXTOS.passoVazio(i + 1), sitio, () => this.tirar(i), true));
 
         // Cada vaso tem um desenho e um botão invisível por cima
         this.vasos = NIVEL.itens.map((dados) => {
@@ -70,8 +70,8 @@ export class Game extends Scene {
             return vaso;
         });
 
-        this.botaoApagar = criarBotao('grupo-controlos', TEXTOS.botoes.apagar, SITIOS.apagar, () => this.apagarUltimo());
-        this.botaoExecutar = criarBotao('grupo-controlos', TEXTOS.botoes.executar, SITIOS.executar, () => this.executar());
+        this.botaoApagar = criarBotao('grupo-controlos', TEXTOS.botoes.apagar, SITIOS.apagar, () => this.apagarUltimo(), true);
+        this.botaoExecutar = criarBotao('grupo-controlos', TEXTOS.botoes.executar, SITIOS.executar, () => this.executar(), true);
         this.botaoMusica = criarBotao('grupo-controlos', TEXTOS.botoes.musica, SITIOS.musica, () => this.ligarOuDesligarMusica());
         this.botaoMusica.setAttribute('aria-pressed', 'true');
         this.botaoRecomecar = criarBotao('grupo-controlos', TEXTOS.botoes.recomecar, SITIOS.recomecar, () => this.recomecar());
@@ -320,8 +320,8 @@ export class Game extends Scene {
         // Um botão que não se pode usar fica mais apagado, e o leitor de ecrã diz "indisponível"
         const podeApagar = this.passos.length > 0 && !this.ganhou;
         const podeExecutar = this.passos.length === TOTAL && !this.ganhou;
-        this.botaoApagar.setAttribute('aria-disabled', !podeApagar);
-        this.botaoExecutar.setAttribute('aria-disabled', !podeExecutar);
+        indisponivel(this.botaoApagar, !podeApagar);
+        indisponivel(this.botaoExecutar, !podeExecutar);
         this.imagens.apagar.setAlpha(podeApagar ? 1 : 0.45);
         this.imagens.executar.setAlpha(podeExecutar ? 1 : 0.45);
     }
